@@ -1,0 +1,16 @@
+config.json
+settings.json
+dist/
+cl/
+package/
+__pycache__/
+*.pyc
+*.pyo
+*.spec
+*.log
+server_clone_progress_*.json
+server_clone_progress_*.json.tmp
+clall_progress_*.json
+clall_progress_*.json.bak
+clfull_progress_*.json
+clfull_progress_*.json.bak

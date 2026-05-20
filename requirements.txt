@@ -1,0 +1,4 @@
+aiohttp>=3.11.0
+cryptography>=44.0.0
+pyinstaller>=6.11.0
+pillow>=11.0.0
