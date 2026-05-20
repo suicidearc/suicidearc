@@ -15,6 +15,8 @@ import builtins
 import tempfile
 import urllib.request
 import urllib.error
+import urllib.parse
+import time
 from datetime import datetime
 
 # ANSI Colors
@@ -240,7 +242,13 @@ def _download_file(url: str, dest_path: str, timeout: int):
 def _fetch_update_manifest(manifest_url: str, timeout: int) -> dict:
     if not manifest_url.lower().startswith("https://"):
         raise RuntimeError("manifest_url precisa usar HTTPS.")
-    req = urllib.request.Request(manifest_url, headers={"User-Agent": f"SuicidePanel/{APP_VERSION}"})
+    sep = "&" if urllib.parse.urlparse(manifest_url).query else "?"
+    fresh_url = f"{manifest_url}{sep}t={int(time.time())}"
+    req = urllib.request.Request(fresh_url, headers={
+        "User-Agent": f"SuicidePanel/{APP_VERSION}",
+        "Cache-Control": "no-cache",
+        "Pragma": "no-cache",
+    })
     with urllib.request.urlopen(req, timeout=timeout) as resp:
         raw = resp.read(1024 * 1024)
     data = json.loads(raw.decode("utf-8"))
@@ -322,6 +330,8 @@ def enforce_mandatory_update():
             manifest = _fetch_update_manifest(manifest_url, timeout)
             latest = str(manifest.get("latest_version") or "").strip()
             min_supported = str(manifest.get("min_supported_version") or latest).strip()
+            print(f"  {BRANCO}Versao remota:{NC} {latest}")
+            print(f"  {BRANCO}Minima permitida:{NC} {min_supported}\n")
             must_update = _version_lt(APP_VERSION, latest) or _version_lt(APP_VERSION, min_supported)
             if not must_update:
                 print(f"  \033[92m*\033[0m Painel atualizado.")
